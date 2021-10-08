@@ -14,11 +14,6 @@
 | conformer | 47.63 M | conf/conformer.yaml | spec_aug + shift | test-clean | ctc_prefix_beam_search |  | |  
 | conformer | 47.63 M | conf/conformer.yaml | spec_aug + shift | test-clean | attention_rescoring |  |  |  
 
-### Test w/o length filter
-| Model | Params | Config | Augmentation| Test set | Decode method | Loss | WER |  
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| conformer | 47.63 M | conf/conformer.yaml | spec_aug + shift | test-clean-all | attention |  |  |  
-
 
 ## Chunk Conformer
 
@@ -33,9 +28,6 @@
 ## Transformer
 | Model | Params | Config | Augmentation| Test set | Decode method | Loss | WER |  
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| transformer | 32.52 M | conf/transformer.yaml | spec_aug + shift | test-clean | attention |  |  |  
-
-### Test w/o length filter
-| Model | Params | Config | Augmentation| Test set | Decode method | Loss | WER |  
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| transformer | 32.52 M | conf/transformer.yaml | spec_aug + shift | test-clean-all | attention | | |  
+| transformer | 32.52 M | conf/transformer.yaml | spec_aug | test-clean | attention | 9.27137279510498, | 0.038421 |  
+| transformer | 32.52 M | conf/transformer.yaml | spec_aug | test-clean | ctc_greedy_search | 9.27137279510498, | 0.120112 |  
+| transformer | 32.52 M | conf/transformer.yaml | spec_aug | test-clean | ctc_prefix_beam_search | 9.27137279510498, | 0.116441 |  

@@ -49,7 +49,7 @@ class CTCLoss(nn.Layer):
         # (TODO:Hui Zhang) ctc loss does not support int64 labels
         ys_pad = ys_pad.astype(paddle.int32)
         loss = self.loss(
-            logits, ys_pad, hlens, ys_lens, norm_by_times=self.batch_average)
+            logits, ys_pad, hlens, ys_lens, norm_by_batchsize=self.batch_average)
         if self.batch_average:
             # Batch-size average
             loss = loss / B
@@ -90,8 +90,8 @@ class LabelSmoothingLoss(nn.Layer):
             size (int): the number of class
             padding_idx (int): padding class id which will be ignored for loss
             smoothing (float): smoothing rate (0.0 means the conventional CE)
-            normalize_length (bool): 
-                True, normalize loss by sequence length; 
+            normalize_length (bool):
+                True, normalize loss by sequence length;
                 False, normalize loss by batch size.
                 Defaults to False.
         """
@@ -108,7 +108,7 @@ class LabelSmoothingLoss(nn.Layer):
         The model outputs and data labels tensors are flatten to
         (batch*seqlen, class) shape and a mask is applied to the
         padding part which should not be calculated for loss.
-        
+
         Args:
             x (paddle.Tensor): prediction (batch, seqlen, class)
             target (paddle.Tensor):

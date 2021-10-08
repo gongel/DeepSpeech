@@ -163,8 +163,8 @@ class Trainer():
             checkpoint_path=self.args.checkpoint_path)
         if infos:
             # restore from ckpt
-            self.iteration = infos["step"]
-            self.epoch = infos["epoch"]
+            self.iteration = infos["step"] + 1
+            self.epoch = infos["epoch"] + 1
             scratch = False
         else:
             self.iteration = 0

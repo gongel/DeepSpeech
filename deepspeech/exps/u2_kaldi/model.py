@@ -393,6 +393,7 @@ class U2Tester(U2Trainer):
                         texts,
                         texts_len,
                         fout=None):
+        logger.info(f"Input: {audio.shape} {audio_len}, {texts} {texts_len}")
         cfg = self.config.decoding
         errors_sum, len_refs, num_ins = 0.0, 0, 0
         errors_func = error_rate.char_errors if cfg.error_rate_type == 'cer' else error_rate.word_errors
@@ -430,8 +431,9 @@ class U2Tester(U2Trainer):
             num_ins += 1
             if fout:
                 fout.write(utt + " " + result + "\n")
-            logger.info("\nTarget Transcription: %s\nOutput Transcription: %s" %
-                        (target, result))
+            logger.info(f"Utt: {utt}")
+            logger.info(f"Ref: {target}")
+            logger.info(f"Hyp: {result}")
             logger.info("One example error rate [%s] = %f" %
                         (cfg.error_rate_type, error_rate_func(target, result)))
 

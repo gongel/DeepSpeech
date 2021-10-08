@@ -16,7 +16,7 @@ collator:
   spm_model_prefix: 'data/bpe_unigram_5000'
   mean_std_filepath: ""
   augmentation_config: conf/augmentation.json
-  batch_size: 64
+  batch_size: 32
   raw_wav: True  # use raw_wav or kaldi feature
   specgram_type: fbank #linear, mfcc, fbank
   feat_dim: 80
@@ -73,13 +73,13 @@ model:
 
 training:
   n_epoch: 120
-  accum_grad: 2
+  accum_grad: 4
   global_grad_clip: 5.0
-  optim: adam
+  optim: noam 
   optim_conf:
-    lr: 0.004
+    lr: 10.0
     weight_decay: 1e-06
-  scheduler: warmuplr     # pytorch v1.1.0+ required
+  scheduler: noam     # pytorch v1.1.0+ required
   scheduler_conf:
     warmup_steps: 25000
     lr_decay: 1.0

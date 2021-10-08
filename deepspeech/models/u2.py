@@ -297,10 +297,12 @@ class U2BaseModel(nn.Layer):
             num_decoding_left_chunks,
             simulate_streaming)  # (B, maxlen, encoder_dim)
         maxlen = encoder_out.size(1)
+        # logger.info(f"att:maxlen {maxlen}")
         encoder_dim = encoder_out.size(2)
         running_size = batch_size * beam_size
         encoder_out = encoder_out.unsqueeze(1).repeat(1, beam_size, 1, 1).view(
             running_size, maxlen, encoder_dim)  # (B*N, maxlen, encoder_dim)
+        # logger.info(f"att: encoder_mask {encoder_mask}")
         encoder_mask = encoder_mask.unsqueeze(1).repeat(
             1, beam_size, 1, 1).view(running_size, 1,
                                      maxlen)  # (B*N, 1, max_len)
@@ -314,6 +316,7 @@ class U2BaseModel(nn.Layer):
             device)  # (B*N, 1)
         end_flag = paddle.zeros_like(scores, dtype=paddle.bool)  # (B*N, 1)
         cache: Optional[List[paddle.Tensor]] = None
+        # logger.info(f"att: hyps {hyps} eos: {self.eos}")
         # 2. Decoder forward step by step
         for i in range(1, maxlen + 1):
             # Stop if all batch and all beam produce eos
@@ -323,6 +326,7 @@ class U2BaseModel(nn.Layer):
             # 2.1 Forward decoder step
             hyps_mask = subsequent_mask(i).unsqueeze(0).repeat(
                 running_size, 1, 1).to(device)  # (B*N, i, i)
+            # logger.info(f"att: {i} {hyps_mask}")
             # logp: (B*N, vocab)
             logp, cache = self.decoder.forward_one_step(
                 encoder_out, encoder_mask, hyps, hyps_mask, cache)
@@ -332,7 +336,7 @@ class U2BaseModel(nn.Layer):
             top_k_logp = mask_finished_scores(top_k_logp, end_flag)
             top_k_index = mask_finished_preds(top_k_index, end_flag, self.eos)
 
-            # 2.3 Seconde beam prune: select topk score with history
+            # 2.3 Second beam prune: select topk score with history
             scores = scores + top_k_logp  # (B*N, N), broadcast add
             scores = scores.view(batch_size, beam_size * beam_size)  # (B, N*N)
             scores, offset_k_index = scores.topk(k=beam_size)  # (B, N)
@@ -356,9 +360,10 @@ class U2BaseModel(nn.Layer):
             hyps = paddle.cat(
                 (last_best_k_hyps, best_k_pred.view(-1, 1)),
                 dim=1)  # (B*N, i+1)
-
+            # logger.info(f"att: hyps {hyps}")
             # 2.6 Update end flag
             end_flag = paddle.eq(hyps[:, -1], self.eos).view(-1, 1)
+            # logger.info(f"att: end_flag {end_flag}")
 
         # 3. Select best of best
         scores = scores.view(batch_size, beam_size)
@@ -368,6 +373,7 @@ class U2BaseModel(nn.Layer):
             batch_size, dtype=paddle.long) * beam_size
         best_hyps = paddle.index_select(hyps, index=best_hyps_index, axis=0)
         best_hyps = best_hyps[:, 1:]
+        # logger.info(f"att: best_hyps {best_hyps}")
         return best_hyps
 
     def ctc_greedy_search(
@@ -802,6 +808,7 @@ class U2BaseModel(nn.Layer):
         else:
             raise ValueError(f"Not support decoding method: {decoding_method}")
 
+        logger.info(f"hyps: {hyps}")
         res = [text_feature.defeaturize(hyp) for hyp in hyps]
         return res
 

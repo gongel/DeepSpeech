@@ -6,7 +6,7 @@ gpus=0,1,2,3
 stage=0
 stop_stage=100
 conf_path=conf/deepspeech2.yaml
-avg_num=1
+avg_num=5
 model_type=offline
 
 source ${MAIN_ROOT}/utils/parse_options.sh || exit 1;
